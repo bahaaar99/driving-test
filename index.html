@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DL25">
+<title>DL25 Driving Test Report</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(console.error);
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;background:#ddd;color:#111;font-size:12px;padding-bottom:70px;-webkit-text-size-adjust:100%}
+.topbar{background:#1a3a5c;color:#fff;padding:10px 8px;text-align:center;position:sticky;top:0;z-index:100}
+.topbar h1{font-size:15px;letter-spacing:.3px}
+.topbar small{font-size:10px;opacity:.8}
+.toolbar{display:flex;gap:5px;padding:6px 4px;background:#fff;border-bottom:1px solid #aaa;flex-wrap:wrap;justify-content:center;position:sticky;top:40px;z-index:99}
+.toolbar button{padding:8px 10px;border:none;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.b-green{background:#2e7d32;color:#fff}.b-blue{background:#1565c0;color:#fff}
+.b-purple{background:#6a1b9a;color:#fff}.b-orange{background:#e65100;color:#fff}.b-gray{background:#546e7a;color:#fff}
+.counter-bar{display:flex;justify-content:center;gap:16px;padding:6px;background:#1a3a5c;color:#fff;font-size:12px;font-weight:700;position:sticky;top:78px;z-index:98}
+.counter-bar .c-n{background:#fff;color:#1a3a5c;border-radius:50%;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;margin-left:3px}
+.page{background:#fff;margin:8px;border:1px solid #999;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.page-head{background:#1a3a5c;color:#fff;padding:6px 8px;font-size:13px;font-weight:700;text-align:center}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid #333}
+.info-cell{padding:4px 6px;border:1px solid #aaa;font-size:11px}
+.info-cell label{font-weight:700;display:block;font-size:10px;color:#555}
+.info-cell input,.info-cell select{width:100%;border:none;border-bottom:1px solid #999;font-size:12px;padding:2px 0;background:transparent}
+.decl-box{border:1px solid #aaa;padding:4px 6px;font-size:9px;line-height:1.3;margin:4px 6px}
+.decl-box .x-mark{float:right;font-weight:900;font-size:14px;color:#c00}
+.veh-grid{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid #333;border-bottom:2px solid #333}
+.veh-cell{padding:4px 6px;border:1px solid #aaa;font-size:11px}
+.veh-cell label{font-weight:700;display:block;font-size:10px;color:#555}
+.veh-cell input,.veh-cell select{width:100%;border:none;border-bottom:1px solid #999;font-size:12px;padding:2px 0;background:transparent}
+.sd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.sd-col{border-right:1px solid #ccc;padding:0}.sd-col:last-child{border-right:none}
+.sd-section{background:#e8eef5;padding:3px 6px;font-weight:700;font-size:11px;border-bottom:1px solid #bbb;border-top:2px solid #888;color:#1a3a5c;text-transform:uppercase;letter-spacing:.3px}
+.sd-section:first-child{border-top:none}
+.sd-row{display:flex;align-items:center;border-bottom:1px solid #e0e0e0;min-height:24px}
+.sd-row .sdl{flex:1;padding:2px 5px;font-size:11px;line-height:1.2}
+.sd-row .sdb{display:flex;flex-shrink:0;position:relative}
+.sdb input[type="radio"]{position:absolute;opacity:0;width:0;height:0}
+.sdb label{display:flex;align-items:center;justify-content:center;width:30px;height:24px;border:1px solid #999;font-size:10px;font-weight:700;cursor:pointer;user-select:none;background:#f5f5f5;color:#555;-webkit-tap-highlight-color:transparent}
+.sdb label:active{transform:scale(.9)}
+input.sr:checked+.sl{background:#a5d6a7!important;color:#1b5e20!important;border-color:#2e7d32!important}
+input.dr:checked+.dl{background:#ef9a9a!important;color:#b71c1c!important;border-color:#c62828!important}
+.sd-row .sco{width:32px;min-width:32px;padding:2px;border:1px solid #bbb;border-radius:3px;font-size:11px;text-align:center;background:#fff;font-weight:700}
+.sd-row .sco:focus{outline:2px solid #1976d2;border-color:#1976d2}
+.sdb .cnt{position:absolute;top:-10px;font-size:9px;font-weight:900;pointer-events:none;z-index:5;min-width:14px;text-align:center;border-radius:6px;padding:0 2px;line-height:13px}
+.sdb .cnt.sc{left:0;background:#2e7d32;color:#fff}
+.sdb .cnt.dc{right:0;background:#c62828;color:#fff}
+.sdb .cnt:empty{display:none}
+.result-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:2px solid #333}
+.result-cell{padding:4px 6px;border:1px solid #aaa;font-size:11px}
+.result-cell label{font-weight:700;display:block;font-size:10px;color:#555}
+.result-cell input,.result-cell select{width:100%;border:none;border-bottom:1px solid #999;font-size:12px;padding:2px 0;background:transparent}
+.p2-grid{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid #333}
+.p2-cell{padding:4px 6px;border:1px solid #aaa;font-size:11px;min-height:40px}
+.p2-cell label{font-weight:700;display:block;font-size:10px;color:#555}
+.p2-cell input,.p2-cell select,.p2-cell textarea{width:100%;border:none;border-bottom:1px solid #999;font-size:12px;padding:2px 0;background:transparent;font-family:inherit}
+.p2-cell textarea{min-height:35px;resize:vertical}
+.footer{text-align:center;font-size:8px;color:#888;padding:4px;border-top:1px solid #ccc}
+.weather-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.weather-grid div{padding:2px 4px;font-size:10px;border:1px solid #e0e0e0}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #aaa;padding:8px 4px;display:flex;gap:4px;justify-content:center;z-index:100}
+.bottom-bar button{padding:12px 8px;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;flex:1;max-width:130px;min-height:44px}
+.toast{position:fixed;bottom:66px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 18px;border-radius:16px;font-size:12px;z-index:200;display:none;white-space:nowrap}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;justify-content:center;align-items:flex-end}
+.modal-bg.active{display:flex}
+.modal-box{background:#fff;width:100%;max-width:500px;max-height:70vh;border-radius:10px 10px 0 0;padding:14px;overflow-y:auto}
+.modal-box h3{margin-bottom:8px;font-size:14px}
+.rec-item{padding:10px;border:1px solid #ddd;border-radius:6px;margin-bottom:6px;background:#fff}
+.rec-item small{color:#888;font-size:10px;display:block}
+.rec-item .rec-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.rec-item .rec-btns button{padding:7px 12px;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;color:#fff}
+.modal-close{width:100%;padding:10px;border:none;background:#eee;border-radius:4px;font-size:13px;margin-top:8px;cursor:pointer}
+/* PDF Overlay */
+#pdfView{display:none;position:fixed;inset:0;z-index:9999;background:#1a1a2e;overflow:auto}
+#pdfView.active{display:block}
+#pdfView .pdf-top{position:sticky;top:0;z-index:10;background:#1a3a5c;color:#fff;padding:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+#pdfView .pdf-top b{font-size:14px}
+#pdfView .pdf-top .pdf-btns{display:flex;gap:6px}
+#pdfView .pdf-top .pdf-btns button{padding:8px 14px;border:none;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+#pdfView .pdf-body{padding:10px;max-width:600px;margin:0 auto}
+#pdfView .pdf-row{display:flex;border-bottom:1px solid #ddd;padding:4px 0;font-size:11px}
+#pdfView .pdf-row .pl{font-weight:700;min-width:120px;color:#555}
+#pdfView .pdf-row .pv{flex:1}
+#pdfView .pdf-section{background:#e8eef5;padding:4px 8px;font-weight:700;font-size:11px;margin:8px 0 4px;border-radius:3px;color:#1a3a5c;text-transform:uppercase}
+#pdfView .pdf-sd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
+#pdfView .pdf-sd-item{display:flex;justify-content:space-between;border:1px solid #eee;padding:3px 6px;font-size:10px}
+#pdfView .pdf-sd-item .sd-mark{font-weight:900;font-size:11px}
+#pdfView .pdf-sd-item .sd-mark.s-mark{color:#2e7d32}
+#pdfView .pdf-sd-item .sd-mark.d-mark{color:#c62828}
+#pdfView .pdf-weather{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;font-size:10px}
+#pdfView .pdf-weather div{padding:2px;border:1px solid #eee}
+#pdfView .pdf-note{font-size:10px;color:#888;text-align:center;padding:8px}
+@media(max-width:500px){#pdfView .pdf-sd-grid{grid-template-columns:1fr}}
+@media print{
+  .topbar,.toolbar,.counter-bar,.bottom-bar,.toast,.modal-bg{display:none!important}
+  body{background:#fff;padding:0}
+  .page{box-shadow:none;margin:0;border:1px solid #000;page-break-after:always}
+  .page:last-child{page-break-after:auto}
+  input.sr:checked+.sl{background:#a5d6a7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  input.dr:checked+.dl{background:#ef9a9a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sd-section{background:#e8eef5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page-head{background:#1a3a5c!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .counter-bar{display:none!important}
+}
+@media(max-width:500px){
+  .sd-grid{grid-template-columns:1fr}
+  .sd-col{border-right:none;border-bottom:1px solid #ccc}
+  .result-row,.info-grid,.veh-grid,.p2-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>DL25 — Driving Test Report</h1>
+  <small>Driver &amp; Vehicle Standards Agency</small>
+</div>
+
+<div class="toolbar">
+  <button class="b-green" id="btnSave">Save</button>
+  <button class="b-blue" id="btnNew">New</button>
+  <button class="b-purple" id="btnPrint">Print</button>
+  <button class="b-orange" id="btnPDF">PDF</button>
+  <button class="b-gray" id="btnRecords">Records</button>
+  <button class="b-gray" id="btnExport">Export</button>
+  <button class="b-gray" id="btnImport">Import</button>
+  <input type="file" id="impFile" accept=".json" style="display:none">
+</div>
+
+<div class="counter-bar">
+  Satisfactory: <span class="c-n" id="cntS">0</span>
+  Defective: <span class="c-n" id="cntD">0</span>
+  Total: <span class="c-n" id="cntTotal">0</span>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page">
+<div class="page-head">DRIVING TEST REPORT — DL25</div>
+<div class="info-grid">
+  <div class="info-cell"><label>Candidate</label><input id="f_candidate" placeholder="Full name"></div>
+  <div class="info-cell"><label>Test category</label><input id="f_category" placeholder="e.g. B"></div>
+  <div class="info-cell"><label>Address</label><input id="f_address" placeholder="Address"></div>
+  <div class="info-cell"><label>Date</label><input type="date" id="f_date"></div>
+  <div class="info-cell"><label>Driver no.</label><input id="f_driverno" placeholder="Driver number"></div>
+  <div class="info-cell"><label>Time</label><input type="time" id="f_time"></div>
+  <div class="info-cell"><label>App ref</label><input id="f_appref" placeholder="Application reference"></div>
+  <div class="info-cell"><label></label></div>
+</div>
+<div style="padding:4px 6px;border-bottom:1px solid #aaa">
+  <div style="display:flex;gap:8px;font-size:9px;line-height:1.3">
+    <div class="decl-box" style="flex:1">I declare that the use of the test vehicle for the purpose of the test is fully covered by a valid policy of insurance which satisfies the requirements of the legislation.<span class="x-mark">X</span></div>
+    <div class="decl-box" style="flex:1">I normally live/have lived in the UK for at least 185 days in the last 12 months (except test ordered by a court after disqualification).<span class="x-mark">X</span></div>
+  </div>
+</div>
+<div style="padding:3px 6px;border-bottom:1px solid #aaa;font-size:10px;display:flex;gap:8px;align-items:center">
+  <b>Test results preference:</b>
+  <label><input type="radio" name="pref" value="post"> Post</label>
+  <label>Email: <input type="text" id="f_email" placeholder="Email address" style="border:none;border-bottom:1px solid #999;width:120px;font-size:11px"></label>
+</div>
+<div class="veh-grid">
+  <div class="veh-cell"><label>Vehicle reg</label><input id="f_vreg" placeholder="Registration"></div>
+  <div class="veh-cell"><label>Instructor reg number</label><input id="f_ireg" placeholder="Instructor reg"></div>
+  <div class="veh-cell"><label>Accompanied by</label><div style="display:flex;gap:6px;font-size:11px;margin-top:2px"><label><input type="checkbox" id="f_ins"> Ins</label><label><input type="checkbox" id="f_int"> Int</label><label><input type="checkbox" id="f_sup"> Sup</label><label><input type="checkbox" id="f_other"> Other</label></div></div>
+  <div class="veh-cell"><label>Vehicle details</label><div style="display:flex;gap:6px;font-size:11px;margin-top:2px"><label><input type="checkbox" id="f_schoolcar"> School car</label><label><input type="checkbox" id="f_dualctrl"> Dual control</label></div></div>
+  <div class="veh-cell"><label>Transmission</label><label><input type="radio" name="trans" value="manual"> Manual</label> <label><input type="radio" name="trans" value="automatic"> Automatic</label></div>
+  <div class="veh-cell"><label>Licence received</label><select id="f_licencereceived"><option value="">—</option><option>Yes</option><option>No</option></select> Pass cert: <input id="f_passcert" style="display:inline;width:80px;border:none;border-bottom:1px solid #999;font-size:11px"></div>
+</div>
+
+<!-- 3-COLUMN S/D GRID -->
+<div class="sd-grid">
+<!-- LEFT -->
+<div class="sd-col">
+<div class="sd-section">Eyesight test</div>
+<div class="sd-row" data-sd="sd_eye"><div class="sdl">Eyesight test</div><div class="sdb"><input type="radio" name="sd_eye" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_eye" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Move off</div>
+<div class="sd-row" data-sd="sd_mo1"><div class="sdl">AS</div><div class="sdb"><input type="radio" name="sd_mo1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_mo1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_mo2"><div class="sdl">NS</div><div class="sdb"><input type="radio" name="sd_mo2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_mo2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_mo3"><div class="sdl">NS</div><div class="sdb"><input type="radio" name="sd_mo3" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_mo3" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_mo4"><div class="sdl">HS / DS</div><div class="sdb"><input type="radio" name="sd_mo4" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_mo4" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Manoeuvres</div>
+<div class="sd-row" data-sd="sd_man1"><div class="sdl">Reverse / Right</div><div class="sdb"><input type="radio" name="sd_man1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_man1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_man2"><div class="sdl">Reverse park (road)</div><div class="sdb"><input type="radio" name="sd_man2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_man2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_man3"><div class="sdl">Reverse park (car park)</div><div class="sdb"><input type="radio" name="sd_man3" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_man3" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_man4"><div class="sdl">Forward park</div><div class="sdb"><input type="radio" name="sd_man4" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_man4" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_man5"><div class="sdl">Control</div><div class="sdb"><input type="radio" name="sd_man5" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_man5" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_man6"><div class="sdl">Observation</div><div class="sdb"><input type="radio" name="sd_man6" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_man6" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Show me / Tell me</div>
+<div class="sd-row" data-sd="sd_smt"><div class="sdl">Show me / Tell me</div><div class="sdb"><input type="radio" name="sd_smt" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_smt" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Controlled stop</div>
+<div class="sd-row" data-sd="sd_cstop"><div class="sdl">Controlled stop</div><div class="sdb"><input type="radio" name="sd_cstop" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_cstop" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Control</div>
+<div class="sd-row" data-sd="sd_c1"><div class="sdl">Clutch</div><div class="sdb"><input type="radio" name="sd_c1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_c1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_c2"><div class="sdl">Gears</div><div class="sdb"><input type="radio" name="sd_c2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_c2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_c3"><div class="sdl">Footbrake</div><div class="sdb"><input type="radio" name="sd_c3" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_c3" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_c4"><div class="sdl">Parking brake</div><div class="sdb"><input type="radio" name="sd_c4" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_c4" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_c5"><div class="sdl">Steering</div><div class="sdb"><input type="radio" name="sd_c5" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_c5" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_c6"><div class="sdl">Precautions</div><div class="sdb"><input type="radio" name="sd_c6" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_c6" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_c7"><div class="sdl">Ancillary controls</div><div class="sdb"><input type="radio" name="sd_c7" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_c7" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_c8"><div class="sdl">Accelerator</div><div class="sdb"><input type="radio" name="sd_c8" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_c8" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+</div>
+
+<!-- MIDDLE -->
+<div class="sd-col">
+<div class="sd-section">Safety</div>
+<div class="sd-row" data-sd="sd_s1"><div class="sdl">Safety</div><div class="sdb"><input type="radio" name="sd_s1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_s1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_s2"><div class="sdl">Control</div><div class="sdb"><input type="radio" name="sd_s2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_s2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Signalling</div>
+<div class="sd-row" data-sd="sd_sg1"><div class="sdl">Signalling</div><div class="sdb"><input type="radio" name="sd_sg1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_sg1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_sg2"><div class="sdl">Change direction</div><div class="sdb"><input type="radio" name="sd_sg2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_sg2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_sg3"><div class="sdl">Change speed</div><div class="sdb"><input type="radio" name="sd_sg3" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_sg3" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Use of mirrors</div>
+<div class="sd-row" data-sd="sd_m1"><div class="sdl">Necessary</div><div class="sdb"><input type="radio" name="sd_m1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_m1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_m2"><div class="sdl">Correctly</div><div class="sdb"><input type="radio" name="sd_m2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_m2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_m3"><div class="sdl">Timed</div><div class="sdb"><input type="radio" name="sd_m3" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_m3" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Signals</div>
+<div class="sd-row" data-sd="sd_sg4"><div class="sdl">Approach speed</div><div class="sdb"><input type="radio" name="sd_sg4" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_sg4" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_sg5"><div class="sdl">Observation</div><div class="sdb"><input type="radio" name="sd_sg5" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_sg5" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Junctions</div>
+<div class="sd-row" data-sd="sd_j1"><div class="sdl">Turning right</div><div class="sdb"><input type="radio" name="sd_j1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_j1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_j2"><div class="sdl">Turning left</div><div class="sdb"><input type="radio" name="sd_j2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_j2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_j3"><div class="sdl">Cutting corners</div><div class="sdb"><input type="radio" name="sd_j3" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_j3" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Judgement</div>
+<div class="sd-row" data-sd="sd_jd1"><div class="sdl">Overtaking</div><div class="sdb"><input type="radio" name="sd_jd1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_jd1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_jd2"><div class="sdl">Meeting</div><div class="sdb"><input type="radio" name="sd_jd2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_jd2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_jd3"><div class="sdl">Crossing</div><div class="sdb"><input type="radio" name="sd_jd3" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_jd3" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+</div>
+
+<!-- RIGHT -->
+<div class="sd-col">
+<div class="sd-section">Normal driving</div>
+<div class="sd-row" data-sd="sd_n1"><div class="sdl">Normal driving</div><div class="sdb"><input type="radio" name="sd_n1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_n1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_n2"><div class="sdl">Lane discipline</div><div class="sdb"><input type="radio" name="sd_n2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_n2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Positioning</div>
+<div class="sd-row" data-sd="sd_p1"><div class="sdl">Appropriate speed</div><div class="sdb"><input type="radio" name="sd_p1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_p1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Progress</div>
+<div class="sd-row" data-sd="sd_pg1"><div class="sdl">Undue hesitation</div><div class="sdb"><input type="radio" name="sd_pg1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_pg1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Response to signs / signals</div>
+<div class="sd-row" data-sd="sd_r1"><div class="sdl">Traffic signs</div><div class="sdb"><input type="radio" name="sd_r1" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_r1" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_r2"><div class="sdl">Road markings</div><div class="sdb"><input type="radio" name="sd_r2" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_r2" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_r3"><div class="sdl">Traffic lights</div><div class="sdb"><input type="radio" name="sd_r3" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_r3" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_r4"><div class="sdl">Traffic controllers</div><div class="sdb"><input type="radio" name="sd_r4" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_r4" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-row" data-sd="sd_r5"><div class="sdl">Other road users</div><div class="sdb"><input type="radio" name="sd_r5" value="S" class="sr"><label class="sl">S</label><input type="radio" name="sd_r5" value="D" class="dr"><label class="dl">D</label></div><input type="number" class="sco" min="0" max="10" placeholder="#"></div>
+<div class="sd-section">Test results</div>
+<div class="result-row">
+<div class="result-cell"><label>Result</label><select id="f_result"><option value="">—</option><option>Pass</option><option>Fail</option><option>None</option></select></div>
+<div class="result-cell"><label>Total faults</label><input type="number" id="f_totalfaults" min="0" value="0"></div>
+<div class="result-cell"><label>Licence received</label><select id="f_licrecv2"><option value="">—</option><option>Yes</option><option>No</option></select></div>
+</div>
+<div style="padding:4px 6px;font-size:9px;border-top:1px solid #aaa;line-height:1.3"><label><input type="checkbox" id="f_ack"> I acknowledge receipt of my pass certificate and confirm there has been no change to my health since I last applied for a licence.</label></div>
+</div>
+</div><!-- /sd-grid -->
+
+<div class="footer">&copy; Crown copyright 07/2019 | ID:INT07/19 | Form Ref: DL25 D0018000-00 | DVSA</div>
+</div><!-- /page 1 -->
+
+<!-- PAGE 2 -->
+<div class="page" style="margin-top:12px">
+<div class="page-head">EXAMINER'S PAGE</div>
+<div class="p2-grid">
+  <div class="p2-cell"><label>Activity code</label><input id="f_activity" placeholder="Activity code"></div>
+  <div class="p2-cell"><label>Route number</label><input id="f_route" placeholder="Route number"></div>
+  <div class="p2-cell"><label>Independent driving</label><div style="display:flex;gap:6px;font-size:11px;margin-top:2px"><label><input type="checkbox" id="f_satnav"> Sat nav</label><label><input type="checkbox" id="f_trafsigns"> Traffic signs</label></div></div>
+  <div class="p2-cell"><label>Debrief witnessed</label><select id="f_debrief"><option value="">—</option><option>Yes</option><option>No</option></select></div>
+  <div class="p2-cell"><label>Identification</label><div style="display:flex;gap:6px;font-size:11px;margin-top:2px"><label><input type="radio" name="ident" value="photocard"> Photocard</label><label><input type="radio" name="ident" value="passport"> Passport</label></div></div>
+  <div class="p2-cell"><label>D255</label><div style="display:flex;gap:6px;font-size:11px;margin-top:2px"><label><input type="radio" name="d255" value="yes"> Yes</label><label><input type="radio" name="d255" value="no"> No</label></div></div>
+  <div class="p2-cell"><label>Language</label><div style="display:flex;gap:6px;font-size:11px;margin-top:2px"><label><input type="radio" name="lang" value="en"> English</label><label><input type="radio" name="lang" value="cy"> Cymraeg</label></div></div>
+  <div class="p2-cell" style="grid-column:span 2"><label>Physical description of the candidate</label><textarea id="f_physical" rows="2" placeholder="Physical description..."></textarea></div>
+</div>
+<div class="p2-grid">
+  <div class="p2-cell"><label>Show me / Tell me question(s)</label><textarea id="f_showtell" rows="2" placeholder="Questions..."></textarea></div>
+  <div class="p2-cell"><label>Additional information</label><textarea id="f_additional" rows="2" placeholder="Additional info..."></textarea></div>
+</div>
+<div style="padding:4px 6px;border:1px solid #aaa"><label style="font-weight:700;font-size:10px;color:#555">Fault descriptions</label><textarea id="f_faultdesc" rows="3" style="width:100%;border:none;border-bottom:1px solid #999;font-size:11px;font-family:inherit" placeholder="Describe faults..."></textarea></div>
+<div style="padding:4px 6px;border:1px solid #aaa;border-top:none">
+  <label style="font-weight:700;font-size:10px;color:#555">Weather conditions</label>
+  <div class="weather-grid">
+    <div><label><input type="checkbox" id="f_w1"> 1. Bright / dry</label></div>
+    <div><label><input type="checkbox" id="f_w4"> 4. Showers</label></div>
+    <div><label><input type="checkbox" id="f_w7"> 7. Dull / dry</label></div>
+    <div><label><input type="checkbox" id="f_w2"> 2. Bright / wet</label></div>
+    <div><label><input type="checkbox" id="f_w5"> 5. Foggy / misty</label></div>
+    <div><label><input type="checkbox" id="f_w8"> 8. Snowing</label></div>
+    <div><label><input type="checkbox" id="f_w3"> 3. Raining</label></div>
+    <div><label><input type="checkbox" id="f_w6"> 6. Dull / wet</label></div>
+    <div><label><input type="checkbox" id="f_w9"> 9. Icy</label></div>
+    <div><label><input type="checkbox" id="f_w10"> 10. Windy</label></div>
+    <div><label><input type="checkbox" id="f_w11"> 11. Other:</label> <input id="f_w11t" style="width:80px;border:none;border-bottom:1px solid #999;font-size:10px"></div>
+  </div>
+</div>
+<div style="padding:6px;border:1px solid #aaa;border-top:none">
+  <div style="display:flex;gap:8px;font-size:11px;margin-bottom:4px">
+    <div style="flex:1"><label style="font-weight:700;font-size:10px">Examiner scheduled</label><input id="f_exjournal" placeholder="Staff number" style="width:100%;border:none;border-bottom:1px solid #999;font-size:11px"></div>
+    <div style="flex:1"><label style="font-weight:700;font-size:10px">Examiner conducted test</label><input id="f_exconducted" placeholder="Staff number" style="width:100%;border:none;border-bottom:1px solid #999;font-size:11px"></div>
+  </div>
+  <div style="display:flex;gap:8px;font-size:11px;align-items:center"><label style="font-weight:700">Examiner's signature</label><input id="f_exsig" style="width:150px;border:none;border-bottom:1px solid #999;font-size:11px"></div>
+</div>
+<div style="padding:4px 6px;border:1px solid #aaa;border-top:none;display:flex;gap:8px;font-size:11px;align-items:center">
+  <b>Date of re-key:</b> <input id="f_rekey" placeholder="DD/MM/YYYY" style="width:100px;border:none;border-bottom:1px solid #999;font-size:11px">
+  <b>Re-keyed by:</b> <input id="f_rekeyedby" style="width:100px;border:none;border-bottom:1px solid #999;font-size:11px">
+</div>
+<div style="padding:6px;border:1px solid #aaa;border-top:none">
+  <label style="font-weight:700;font-size:10px">Trainer / Instructor Notes</label>
+  <textarea id="f_notes" rows="2" style="width:100%;border:none;border-bottom:1px solid #999;font-size:11px;font-family:inherit" placeholder="Notes..."></textarea>
+</div>
+<div class="footer">&copy; Crown copyright 07/2019 | ID:INT07/19 | Form Ref: DL25 D0018000-00 | DVSA</div>
+</div><!-- /page 2 -->
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <button class="b-green" id="btnSave2">Save</button>
+  <button class="b-blue" id="btnNew2">New</button>
+  <button class="b-purple" id="btnPrint2">Print</button>
+  <button class="b-orange" id="btnPDF2">PDF</button>
+  <button class="b-gray" id="btnRecords2">Records</button>
+  <button class="b-gray" id="btnExport2">Export</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-bg" id="recModal"><div class="modal-box"><h3>Saved Records</h3><div id="recList"></div><button class="modal-close" id="btnCloseModal">Close</button></div></div>
+
+<script>
+(function(){
+'use strict';
+
+/* Field IDs */
+var TF=['f_candidate','f_category','f_address','f_date','f_driverno','f_time','f_appref','f_email','f_vreg','f_ireg','f_passcert','f_licencereceived','f_result','f_totalfaults','f_ack','f_activity','f_route','f_debrief','f_physical','f_showtell','f_additional','f_faultdesc','f_rekey','f_rekeyedby','f_exjournal','f_exconducted','f_exsig','f_notes','f_w11t'];
+var CB=['f_ins','f_int','f_sup','f_other','f_schoolcar','f_dualctrl','f_satnav','f_trafsigns','f_w1','f_w2','f_w3','f_w4','f_w5','f_w6','f_w7','f_w8','f_w9','f_w10','f_w11'];
+var RG=['pref','trans','ident','d255','lang'];
+var SD_NAMES=['sd_eye','sd_mo1','sd_mo2','sd_mo3','sd_mo4','sd_man1','sd_man2','sd_man3','sd_man4','sd_man5','sd_man6','sd_smt','sd_cstop','sd_c1','sd_c2','sd_c3','sd_c4','sd_c5','sd_c6','sd_c7','sd_c8','sd_s1','sd_s2','sd_sg1','sd_sg2','sd_sg3','sd_m1','sd_m2','sd_m3','sd_sg4','sd_sg5','sd_j1','sd_j2','sd_j3','sd_jd1','sd_jd2','sd_jd3','sd_n1','sd_n2','sd_p1','sd_pg1','sd_r1','sd_r2','sd_r3','sd_r4','sd_r5'];
+
+/* Click counters */
+var CC={};
+
+/* ---- CORE FUNCTIONS ---- */
+
+function clickSD(name, val) {
+  if (!CC[name]) CC[name] = {s: 0, d: 0};
+  if (val === 'S') {
+    CC[name].s = CC[name].s >= 10 ? 10 : CC[name].s + 1;
+  } else {
+    CC[name].d = CC[name].d >= 10 ? 10 : CC[name].d + 1;
+  }
+  updateBadges();
+}
+
+function updateBadges() {
+  var totalS = 0, totalD = 0;
+  for (var i = 0; i < SD_NAMES.length; i++) {
+    var n = SD_NAMES[i];
+    var c = CC[n] || {s: 0, d: 0};
+    totalS += c.s;
+    totalD += c.d;
+    /* Update badge text for this row */
+    var row = document.querySelector('.sd-row[data-sd="' + n + '"]');
+    if (!row) continue;
+    var sdb = row.querySelector('.sdb');
+    if (!sdb) continue;
+    var sc = sdb.querySelector('.cnt.sc');
+    var dc = sdb.querySelector('.cnt.dc');
+    if (sc) sc.textContent = c.s > 0 ? String(c.s) : '';
+    if (dc) dc.textContent = c.d > 0 ? String(c.d) : '';
+  }
+  document.getElementById('cntS').textContent = totalS;
+  document.getElementById('cntD').textContent = totalD;
+  document.getElementById('cntTotal').textContent = totalS + totalD;
+}
+
+function collectData() {
+  var data = {};
+  var i, e;
+  for (i = 0; i < TF.length; i++) {
+    e = document.getElementById(TF[i]);
+    if (e) data[TF[i]] = e.value;
+  }
+  for (i = 0; i < CB.length; i++) {
+    e = document.getElementById(CB[i]);
+    if (e) data[CB[i]] = e.checked;
+  }
+  for (i = 0; i < RG.length; i++) {
+    var c = document.querySelector('input[name="' + RG[i] + '"]:checked');
+    data[RG[i]] = c ? c.value : '';
+  }
+  for (i = 0; i < SD_NAMES.length; i++) {
+    var sc = document.querySelector('input[name="' + SD_NAMES[i] + '"]:checked');
+    data[SD_NAMES[i]] = sc ? sc.value : '';
+  }
+  /* Score inputs */
+  var scores = {};
+  document.querySelectorAll('.sd-row').forEach(function(row) {
+    var sd = row.getAttribute('data-sd');
+    var sco = row.querySelector('.sco');
+    if (sd && sco && sco.value) scores[sd] = sco.value;
+  });
+  data._scores = scores;
+  data._clicks = JSON.parse(JSON.stringify(CC));
+  data._id = data._id || Date.now();
+  data._name = data.f_candidate || '';
+  data._date = data.f_date || '';
+  return data;
+}
+
+function fillForm(d) {
+  CC = d._clicks ? JSON.parse(JSON.stringify(d._clicks)) : {};
+  var i, e;
+  for (i = 0; i < TF.length; i++) {
+    e = document.getElementById(TF[i]);
+    if (e && d[TF[i]] !== undefined) e.value = d[TF[i]];
+  }
+  for (i = 0; i < CB.length; i++) {
+    e = document.getElementById(CB[i]);
+    if (e && d[CB[i]] !== undefined) e.checked = !!d[CB[i]];
+  }
+  for (i = 0; i < RG.length; i++) {
+    document.querySelectorAll('input[name="' + RG[i] + '"]').forEach(function(r) {
+      r.checked = (r.value === d[RG[i]]);
+    });
+  }
+  for (i = 0; i < SD_NAMES.length; i++) {
+    document.querySelectorAll('input[name="' + SD_NAMES[i] + '"]').forEach(function(r) {
+      r.checked = (r.value === d[SD_NAMES[i]]);
+    });
+  }
+  /* Scores */
+  var scores = d._scores || {};
+  document.querySelectorAll('.sd-row').forEach(function(row) {
+    var sd = row.getAttribute('data-sd');
+    var sco = row.querySelector('.sco');
+    if (sd && sco) sco.value = scores[sd] || '';
+  });
+  updateBadges();
+}
+
+function getAll() {
+  try { var r = localStorage.getItem('dl25r'); return r ? JSON.parse(r) : []; }
+  catch(e) { return []; }
+}
+
+function setAll(a) {
+  try { localStorage.setItem('dl25r', JSON.stringify(a)); }
+  catch(e) {}
+}
+
+function showT(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.style.display = 'none'; }, 2500);
+}
+
+function closeModal() {
+  document.getElementById('recModal').classList.remove('active');
+}
+
+/* ---- BUTTON ACTIONS ---- */
+
+function saveForm() {
+  var d = collectData();
+  var a = getAll();
+  var idx = -1;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i]._id === d._id) { idx = i; break; }
+  }
+  if (idx >= 0) a[idx] = d;
+  else a.push(d);
+  setAll(a);
+  showT('Saved!');
+}
+
+function newForm() {
+  CC = {};
+  TF.forEach(function(id) { var e = document.getElementById(id); if (e) e.value = ''; });
+  CB.forEach(function(id) { var e = document.getElementById(id); if (e) e.checked = false; });
+  RG.concat(SD_NAMES).forEach(function(n) {
+    document.querySelectorAll('input[name="' + n + '"]').forEach(function(r) { r.checked = false; });
+  });
+  document.querySelectorAll('.sco').forEach(function(s) { s.value = ''; });
+  updateBadges();
+  showT('New form');
+}
+
+function showRec() {
+  var a = getAll();
+  var el = document.getElementById('recList');
+  if (!a.length) {
+    el.innerHTML = '<p style="text-align:center;color:#999;padding:14px">No records</p>';
+  } else {
+    var h = '';
+    for (var i = a.length - 1; i >= 0; i--) {
+      var nm = a[i]._name || '--';
+      var dt = a[i]._date || '--';
+      var rs = a[i].f_result || '--';
+      h += '<div class="rec-item">';
+      h += '<b>' + nm + '</b>';
+      h += '<small>' + dt + ' | Result: ' + rs + '</small>';
+      h += '<div class="rec-btns">';
+      h += '<button style="background:#2e7d32" data-action="edit" data-idx="' + i + '">Edit</button>';
+      h += '<button style="background:#1565c0" data-action="pdf" data-idx="' + i + '">Print</button>';
+      h += '<button style="background:#c62828" data-action="del" data-idx="' + i + '">Delete</button>';
+      h += '</div></div>';
+    }
+    el.innerHTML = h;
+  }
+  document.getElementById('recModal').classList.add('active');
+}
+
+function editRec(i) {
+  var a = getAll();
+  if (a[i]) {
+    fillForm(a[i]);
+    closeModal();
+    showT('Loaded — edit and Save');
+    window.scrollTo(0, 0);
+  }
+}
+
+function delRec(i) {
+  var a = getAll();
+  a.splice(i, 1);
+  setAll(a);
+  showRec();
+  showT('Deleted');
+}
+
+function exportJSON() {
+  var data = JSON.stringify(getAll(), null, 2);
+  var blob = new Blob([data], {type: 'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dl25_records.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  showT('Exported');
+}
+
+function importJSON(file) {
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var d = JSON.parse(ev.target.result);
+      if (Array.isArray(d)) {
+        var existing = getAll();
+        setAll(existing.concat(d));
+        showT(d.length + ' records imported');
+      } else if (d._id) {
+        fillForm(d);
+        showT('Record loaded');
+      }
+    } catch(err) {
+      showT('Invalid file');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ---- INIT ---- */
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  /* Create counter badge spans in each .sdb */
+  document.querySelectorAll('.sdb').forEach(function(sdb) {
+    if (sdb.querySelector('.cnt.sc')) return; /* already exists */
+    var cs = document.createElement('span');
+    cs.className = 'cnt sc';
+    sdb.appendChild(cs);
+    var cd = document.createElement('span');
+    cd.className = 'cnt dc';
+    sdb.appendChild(cd);
+  });
+
+  /* Use event delegation on document for S/D label clicks.
+     This works for both mouse clicks AND touch-triggered clicks on iPhone. */
+  document.addEventListener('click', function(e) {
+    var lbl = e.target.closest('.sdb label');
+    if (!lbl) return;
+    var sdb = lbl.closest('.sdb');
+    if (!sdb) return;
+    var inp = lbl.previousElementSibling;
+    if (!inp || inp.type !== 'radio') return;
+    /* The label toggles the radio via native behavior.
+       Now increment our counter. */
+    var row = sdb.closest('.sd-row');
+    var sdName = row ? row.getAttribute('data-sd') : null;
+    if (sdName) {
+      clickSD(sdName, inp.value);
+    }
+  }, true); /* useCapture so it fires before any other handlers */
+
+  /* Button bindings */
+  function bindBtn(id, fn) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('click', fn);
+  }
+  bindBtn('btnSave', saveForm);
+  bindBtn('btnNew', newForm);
+  bindBtn('btnPrint', function() { window.print(); });
+  bindBtn('btnRecords', showRec);
+  bindBtn('btnExport', exportJSON);
+  bindBtn('btnSave2', saveForm);
+  bindBtn('btnNew2', newForm);
+  bindBtn('btnPrint2', function() { window.print(); });
+  bindBtn('btnRecords2', showRec);
+  bindBtn('btnExport2', exportJSON);
+  bindBtn('btnCloseModal', closeModal);
+  bindBtn('btnPDF', function() { showPDFOverlay(); });
+  bindBtn('btnPDF2', function() { showPDFOverlay(); });
+
+  /* Import file handler */
+  document.getElementById('btnImport').addEventListener('click', function() {
+    document.getElementById('impFile').click();
+  });
+  document.getElementById('impFile').addEventListener('change', function(e) {
+    if (e.target.files[0]) importJSON(e.target.files[0]);
+    e.target.value = '';
+  });
+
+  /* Records modal button delegation */
+  document.getElementById('recList').addEventListener('click', function(e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    var idx = parseInt(btn.getAttribute('data-idx'), 10);
+    if (action === 'edit') editRec(idx);
+    else if (action === 'pdf') {
+      editRec(idx);
+      setTimeout(function() { window.print(); }, 300);
+    }
+    else if (action === 'del') delRec(idx);
+  });
+
+  /* Close modal on background click */
+  document.getElementById('recModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+
+  /* PDF Overlay Functions */
+  function showPDFOverlay() {
+    var data = collectData();
+    var html = buildPDFHTML(data);
+    var ov = document.createElement('div');
+    ov.id = 'pdfView';
+    ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:#1a1a2e;overflow:auto';
+    var h = '<div style="position:fixed;top:0;left:0;right:0;background:#1a3a5c;color:#fff;padding:10px 12px;z-index:100000;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">';
+    h += '<b style="font-size:14px">' + (data.f_candidate || 'DL25 Report') + '</b>';
+    h += '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">';
+    h += '<button id="btnPDFSave" style="background:#2e7d32;color:#fff;border:none;padding:8px 14px;border-radius:4px;font-size:13px;font-weight:bold" onclick="savePDF()">Save as PDF</button>';
+    h += '<span onclick="closePDF()" style="cursor:pointer;font-size:24px;padding:4px 10px">&times;</span>';
+    h += '</div></div>';
+    h += '<div class="pdf-body" id="pdfContent" style="padding-top:60px;padding-bottom:20px;">' + html + '</div>';
+    ov.innerHTML = h;
+    document.body.appendChild(ov);
+  }
+
+  /* Save PDF - tries multiple methods */
+  function savePDF() {
+    /* Method 1: Web Share API (Safari on HTTPS) */
+    try {
+      var data = collectData();
+      var pdfDataUri = makeRealPDF(data);
+      if (!pdfDataUri) { showT('PDF failed'); return; }
+      var fileName = (data.f_candidate || 'DL25').replace(/[^a-z0-9]/gi, '_') + '.pdf';
+      var byteStr = atob(pdfDataUri.split(',')[1]);
+      var arr = new Uint8Array(byteStr.length);
+      for (var i = 0; i < byteStr.length; i++) arr[i] = byteStr.charCodeAt(i);
+      var blob = new Blob([arr], {type: 'application/pdf'});
+      var file = new File([blob], fileName, {type: 'application/pdf'});
+      if (navigator.share && navigator.canShare && navigator.canShare({files: [file]})) {
+        navigator.share({files: [file], title: fileName})
+          .then(function(){ showT('Saved!'); closePDF(); })
+          .catch(function(){});
+        return;
+      }
+    } catch(e){}
+    /* Method 2: Download link (desktop) */
+    try {
+      if (pdfDataUri) {
+        var a = document.createElement('a');
+        a.href = pdfDataUri;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showT('PDF downloaded');
+        closePDF();
+        return;
+      }
+    } catch(e){}
+    /* Method 3: window.print() - works everywhere */
+    window.print();
+  }
+
+  /* Real PDF binary generator (minimal jsPDF-like) */
+  function makeRealPDF(d) {
+    function gv(k) { return d[k] || ''; }
+    function gc(k) { return d[k] ? true : false; }
+    function gs(k) { var e = document.getElementById(k); if (!e || !d[k]) return ''; for (var i = 0; i < e.options.length; i++) { if (e.options[i].value === d[k]) return e.options[i].text; } return ''; }
+    function sdMark(n) {
+      var rc = document.querySelector('input[name="' + n + '"].sr:checked');
+      var dc = document.querySelector('input[name="' + n + '"].dr:checked');
+      if (dc) return 'D'; if (rc) return 'S'; return '';
+    }
+
+    var W = 595.28, H = 841.89; // A4 in points
+    var objects = [];
+    var streams = [];
+    var fontRegular = null, fontBold = null;
+
+    function addObj(content) { objects.push(content); return objects.length; }
+    function ref(n) { return n + ' 0 R'; }
+
+    // Standard 14 PDF fonts (no embedding needed)
+    fontRegular = addObj('<</Type/Font/Subtype/Type1/BaseFont/Helvetica/Encoding/WinAnsiEncoding>>');
+    fontBold = addObj('<</Type/Font/Subtype/Type1/BaseFont/Helvetica-Bold/Encoding/WinAnsiEncoding>>');
+
+    function newPage() { streams.push(''); return streams.length - 1; }
+    function write(page, str) { streams[page] += str; }
+    function text(page, txt, x, y, size, bold) {
+      var font = bold ? ref(fontBold) : ref(fontRegular);
+      var safe = txt.replace(/\\\\/g, '\\\\\\\\').replace(/\(/g, '\\\\(').replace(/\)/g, '\\\\)');
+      write(page, 'BT ' + font + ' ' + size + ' Tf ' + x + ' ' + y + ' Td (' + safe + ') Tj ET ');
+    }
+    function rect(page, x, y, w, h, r, g, b) {
+      write(page, r + ' ' + g + ' ' + b + ' rg ' + x + ' ' + y + ' ' + w + ' ' + h + ' re f ');
+    }
+    function line(page, x1, y1, x2, y2) {
+      write(page, '0.5 0.5 0.5 RG ' + x1 + ' ' + y1 + ' m ' + x2 + ' ' + y2 + ' l S ');
+    }
+
+    // ========== PAGE 1 ==========
+    var p = newPage();
+    var y = H - 40;
+    rect(p, 0, H-50, W, 50, 0.1, 0.23, 0.36);
+    text(p, 'DRIVING TEST REPORT \u2014 DL25', 60, H-30, 18, true);
+
+    function section(p, title, yPos) {
+      rect(p, 30, yPos-2, W-60, 18, 0.91, 0.93, 0.96);
+      text(p, title, 35, yPos+10, 10, true);
+      return yPos - 22;
+    }
+    function field(p, label, value, yPos, x) {
+      x = x || 35;
+      text(p, label, x, yPos, 9, true);
+      text(p, value, x + 90, yPos, 9);
+      return yPos - 14;
+    }
+
+    y = section(p, 'CANDIDATE DETAILS', y);
+    y = field(p, 'Candidate:', gv('f_candidate'), y);
+    y = field(p, 'Category:', gv('f_category'), y); y = field(p, 'Date:', gv('f_date'), y, 300);
+    y = field(p, 'Driver No:', gv('f_driverno'), y); y = field(p, 'Time:', gv('f_time'), y, 300);
+    y = field(p, 'App Ref:', gv('f_appref'), y); y = field(p, 'Email:', gv('f_email'), y, 300);
+    y = field(p, 'Address:', gv('f_address'), y);
+    y -= 6;
+
+    y = section(p, 'VEHICLE DETAILS', y);
+    y = field(p, 'Reg:', gv('f_vreg'), y); y = field(p, 'Instructor Reg:', gv('f_ireg'), y, 300);
+    y = field(p, 'Transmission:', gv('trans'), y); y = field(p, 'Licence Recvd:', gv('f_licencereceived'), y, 300);
+    y -= 6;
+
+    y = section(p, 'TEST RESULT', y);
+    y = field(p, 'Result:', gv('f_result'), y); y = field(p, 'Total Faults:', gv('f_totalfaults'), y, 300);
+    y -= 6;
+
+    // S/D Grid
+    y = section(p, 'DRIVING TEST ITEMS', y);
+    var sdl = [
+      ['Eyesight', 'sd_eye'],
+      ['Move off - AS', 'sd_mo1'], ['Move off - NS', 'sd_mo2'], ['Move off - NS', 'sd_mo3'], ['Move off - HS/DS', 'sd_mo4'],
+      ['Rev/Right', 'sd_man1'], ['Rev Park (road)', 'sd_man2'], ['Rev Park (car park)', 'sd_man3'], ['Fwd Park', 'sd_man4'], ['Man Control', 'sd_man5'], ['Man Obs', 'sd_man6'],
+      ['Show/Tell', 'sd_smt'], ['Ctrl Stop', 'sd_cstop'],
+      ['Clutch', 'sd_c1'], ['Gears', 'sd_c2'], ['Footbrake', 'sd_c3'], ['Park Brake', 'sd_c4'], ['Steering', 'sd_c5'], ['Precautions', 'sd_c6'], ['Ancillary', 'sd_c7'], ['Accelerator', 'sd_c8'],
+      ['Safety', 'sd_s1'], ['Safety Ctrl', 'sd_s2'],
+      ['Signalling', 'sd_sg1'], ['Chg Dir', 'sd_sg2'], ['Chg Spd', 'sd_sg3'],
+      ['Mirrors Nec', 'sd_m1'], ['Mirrors Corr', 'sd_m2'], ['Mirrors Timed', 'sd_m3'],
+      ['Approach Spd', 'sd_sg4'], ['Obs', 'sd_sg5'],
+      ['Turn R', 'sd_j1'], ['Turn L', 'sd_j2'], ['Cut Cnrs', 'sd_j3'],
+      ['Overtake', 'sd_jd1'], ['Meeting', 'sd_jd2'], ['Crossing', 'sd_jd3'],
+      ['Norm Drive', 'sd_n1'], ['Lane Disc', 'sd_n2'], ['Appr Speed', 'sd_p1'], ['Undue Hes', 'sd_pg1'],
+      ['Traffic Signs', 'sd_r1'], ['Road Marks', 'sd_r2'], ['Traffic Lights', 'sd_r3'], ['Traffic Ctrl', 'sd_r4'], ['Other Users', 'sd_r5']
+    ];
+    var colW = 130, rowH = 12, startX = 35, startY = y;
+    for (var i = 0; i < sdl.length; i++) {
+      var col = Math.floor(i / 34); // 34 rows per column
+      var row = i % 34;
+      var x = startX + col * (colW + 10);
+      var ry = startY - row * rowH;
+      if (ry < 60) continue;
+      text(p, sdl[i][0], x, ry, 7);
+      var mark = sdMark(sdl[i][1]);
+      var score = d._scores && d._scores[sdl[i][1]] ? '#' + d._scores[sdl[i][1]] : '';
+      var mx = x + 85;
+      if (mark === 'S') { rect(p, mx, ry-3, 18, 10, 0.64, 0.86, 0.65); text(p, 'S', mx+4, ry+3, 8, true); }
+      else if (mark === 'D') { rect(p, mx, ry-3, 18, 10, 0.94, 0.6, 0.6); text(p, 'D', mx+4, ry+3, 8, true); }
+      else { rect(p, mx, ry-3, 18, 10, 0.95, 0.95, 0.95); }
+      if (score) text(p, score, mx+22, ry, 7);
+    }
+    y = startY - 34 * rowH - 10;
+
+    // ========== PAGE 2 ==========
+    var p2 = newPage();
+    y = H - 40;
+    rect(p2, 0, H-50, W, 50, 0.1, 0.23, 0.36);
+    text(p2, 'EXAMINER\u2019S PAGE', 60, H-30, 18, true);
+
+    y = section(p2, 'EXAMINER DETAILS', y);
+    y = field(p2, 'Scheduled:', gv('f_exjournal'), y); y = field(p2, 'Conducted:', gv('f_exconducted'), y, 300);
+    y = field(p2, 'Signature:', gv('f_exsig'), y);
+    y = field(p2, 'Re-key Date:', gv('f_rekey'), y); y = field(p2, 'Re-keyed By:', gv('f_rekeyedby'), y, 300);
+    y -= 6;
+
+    y = section(p2, 'WEATHER', y);
+    var wx = [];
+    if (gc('f_w1')) wx.push('Bright/Dry'); if (gc('f_w2')) wx.push('Bright/Wet'); if (gc('f_w3')) wx.push('Raining');
+    if (gc('f_w4')) wx.push('Showers'); if (gc('f_w5')) wx.push('Foggy'); if (gc('f_w6')) wx.push('Dull/Wet');
+    if (gc('f_w7')) wx.push('Dull/Dry'); if (gc('f_w8')) wx.push('Snowing'); if (gc('f_w9')) wx.push('Icy');
+    if (gc('f_w10')) wx.push('Windy'); if (gc('f_w11')) wx.push('Other: ' + gv('f_w11t'));
+    y = field(p2, 'Conditions:', wx.join(', ') || 'None', y);
+    y -= 6;
+
+    y = section(p2, 'FAULT DESCRIPTIONS', y);
+    var desc = gv('f_faultdesc');
+    var lines = desc ? desc.match(/.{1,85}/g) || [desc] : [''];
+    for (var li = 0; li < lines.length && li < 8; li++) {
+      text(p2, lines[li], 35, y, 8);
+      y -= 12;
+    }
+    y -= 6;
+
+    y = section(p2, 'TRAINER NOTES', y);
+    var notes = gv('f_notes');
+    var nlines = notes ? notes.match(/.{1,85}/g) || [notes] : [''];
+    for (var ni = 0; ni < nlines.length && ni < 6; ni++) {
+      text(p2, nlines[ni], 35, y, 8);
+      y -= 12;
+    }
+
+    // ========== BUILD PDF ==========
+    var pageObjs = [];
+    for (var pi = 0; pi < streams.length; pi++) {
+      var content = streams[pi];
+      var len = content.length;
+      var contentObj = addObj('<</Length ' + len + '>>\nstream\n' + content + '\nendstream');
+      var pageObj = addObj('<</Type/Page/Parent ' + ref(pagesObj) + '/MediaBox[0 0 ' + W + ' ' + H + ']/Contents ' + ref(contentObj) + '/Resources<</Font<</F1 ' + ref(fontRegular) + '/F2 ' + ref(fontBold) + '>>>>>>');
+      pageObjs.push(pageObj);
+    }
+
+    var pagesObj = addObj('<</Type/Pages/Kids[' + pageObjs.map(ref).join(' ') + ']/Count ' + streams.length + '>>');
+    var catalog = addObj('<</Type/Catalog/Pages ' + ref(pagesObj) + '>>');
+
+    // Build final PDF
+    var pdf = '%PDF-1.4\n';
+    var offsets = [];
+    for (var oi = 0; oi < objects.length; oi++) {
+      offsets.push(pdf.length);
+      pdf += (oi+1) + ' 0 obj\n' + objects[oi] + '\nendobj\n';
+    }
+    var xrefStart = pdf.length;
+    pdf += 'xref\n0 ' + (objects.length+1) + '\n';
+    pdf += '0000000000 65535 f \n';
+    for (var xi = 0; xi < offsets.length; xi++) {
+      pdf += ('0000000000' + offsets[xi]).slice(-10) + ' 00000 n \n';
+    }
+    pdf += 'trailer\n<< /Size ' + (objects.length+1) + ' /Root ' + ref(catalog) + ' >>\nstartxref\n' + xrefStart + '\n%%EOF';
+
+    return 'data:application/pdf;base64,' + btoa(pdf);
+  }
+
+  function buildPDFHTML(d) {
+    function gv(k) { return d[k] || ''; }
+    function gc(k) { return d[k] ? '\u2713' : ''; }
+    function gs(k) { var e = document.getElementById(k); if (!e || !d[k]) return ''; for (var i = 0; i < e.options.length; i++) { if (e.options[i].value === d[k]) return e.options[i].text; } return ''; }
+    function sdMark(n) {
+      var rc = document.querySelector('input[name="' + n + '"].sr:checked');
+      var dc = document.querySelector('input[name="' + n + '"].dr:checked');
+      if (dc) return '<span style="background:#c62828;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:bold">D</span>';
+      if (rc) return '<span style="background:#2e7d32;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:bold">S</span>';
+      return '<span style="background:#999;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px">\u2014</span>';
+    }
+    var h = '';
+    h += '<div style="background:#fff;margin:10px;padding:16px;box-shadow:0 0 10px rgba(0,0,0,.3)">'; // page 1
+    h += '<div style="background:#1a3a5c;color:#fff;padding:10px;margin:-16px -16px 16px -16px;text-align:center;font-size:16px;font-weight:bold">DRIVING TEST REPORT \u2014 DL25</div>';
+    h += '<table style="width:100%;border-collapse:collapse;font-size:11px">';
+    h += '<tr style="background:#e8eef5"><td colspan="4" style="padding:6px;font-weight:bold;color:#1a3a5c;text-transform:uppercase">CANDIDATE DETAILS</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Candidate</td><td style="border:1px solid #999;padding:4px" colspan="3">' + gv('f_candidate') + '</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Category</td><td style="border:1px solid #999;padding:4px">' + gv('f_category') + '</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Date</td><td style="border:1px solid #999;padding:4px">' + gv('f_date') + '</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Driver No</td><td style="border:1px solid #999;padding:4px">' + gv('f_driverno') + '</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Time</td><td style="border:1px solid #999;padding:4px">' + gv('f_time') + '</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">App Ref</td><td style="border:1px solid #999;padding:4px">' + gv('f_appref') + '</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Email</td><td style="border:1px solid #999;padding:4px">' + gv('f_email') + '</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Address</td><td style="border:1px solid #999;padding:4px" colspan="3">' + gv('f_address') + '</td></tr>';
+    h += '<tr style="background:#e8eef5"><td colspan="4" style="padding:6px;font-weight:bold;color:#1a3a5c;text-transform:uppercase">VEHICLE DETAILS</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Reg</td><td style="border:1px solid #999;padding:4px">' + gv('f_vreg') + '</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Instructor Reg</td><td style="border:1px solid #999;padding:4px">' + gv('f_ireg') + '</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Transmission</td><td style="border:1px solid #999;padding:4px">' + gv('trans') + '</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Licence Recvd</td><td style="border:1px solid #999;padding:4px">' + gv('f_licencereceived') + '</td></tr>';
+    h += '<tr style="background:#e8eef5"><td colspan="4" style="padding:6px;font-weight:bold;color:#1a3a5c;text-transform:uppercase">TEST RESULT</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Result</td><td style="border:1px solid #999;padding:4px">' + gv('f_result') + '</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Total Faults</td><td style="border:1px solid #999;padding:4px">' + gv('f_totalfaults') + '</td></tr>';
+    h += '</table>';
+    // S/D items
+    var sdl = [
+      ['Eyesight', 'sd_eye'],
+      ['Move off - AS', 'sd_mo1'], ['Move off - NS', 'sd_mo2'], ['Move off - NS', 'sd_mo3'], ['Move off - HS/DS', 'sd_mo4'],
+      ['Rev/Right', 'sd_man1'], ['Rev Park (road)', 'sd_man2'], ['Rev Park (car park)', 'sd_man3'], ['Fwd Park', 'sd_man4'], ['Man Control', 'sd_man5'], ['Man Obs', 'sd_man6'],
+      ['Show/Tell', 'sd_smt'], ['Ctrl Stop', 'sd_cstop'],
+      ['Clutch', 'sd_c1'], ['Gears', 'sd_c2'], ['Footbrake', 'sd_c3'], ['Park Brake', 'sd_c4'], ['Steering', 'sd_c5'], ['Precautions', 'sd_c6'], ['Ancillary', 'sd_c7'], ['Accelerator', 'sd_c8'],
+      ['Safety', 'sd_s1'], ['Safety Ctrl', 'sd_s2'],
+      ['Signalling', 'sd_sg1'], ['Chg Dir', 'sd_sg2'], ['Chg Spd', 'sd_sg3'],
+      ['Mirrors Nec', 'sd_m1'], ['Mirrors Corr', 'sd_m2'], ['Mirrors Timed', 'sd_m3'],
+      ['Approach Spd', 'sd_sg4'], ['Obs', 'sd_sg5'],
+      ['Turn R', 'sd_j1'], ['Turn L', 'sd_j2'], ['Cut Cnrs', 'sd_j3'],
+      ['Overtake', 'sd_jd1'], ['Meeting', 'sd_jd2'], ['Crossing', 'sd_jd3'],
+      ['Norm Drive', 'sd_n1'], ['Lane Disc', 'sd_n2'], ['Appr Speed', 'sd_p1'], ['Undue Hes', 'sd_pg1'],
+      ['Traffic Signs', 'sd_r1'], ['Road Marks', 'sd_r2'], ['Traffic Lights', 'sd_r3'], ['Traffic Ctrl', 'sd_r4'], ['Other Users', 'sd_r5']
+    ];
+    h += '<div style="background:#fff;margin:10px;padding:16px;box-shadow:0 0 10px rgba(0,0,0,.3)">'; // page 2
+    h += '<div style="background:#1a3a5c;color:#fff;padding:10px;margin:-16px -16px 16px -16px;text-align:center;font-size:16px;font-weight:bold">EXAMINER\u2019S PAGE</div>';
+    h += '<table style="width:100%;border-collapse:collapse;font-size:11px">';
+    h += '<tr style="background:#e8eef5"><td colspan="4" style="padding:6px;font-weight:bold;color:#1a3a5c;text-transform:uppercase">DRIVING TEST ITEMS</td></tr>';
+    h += '<tr style="background:#e8eef5"><td style="border:1px solid #999;padding:4px;font-weight:bold">Item</td><td style="border:1px solid #999;padding:4px;font-weight:bold">S/D</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Item</td><td style="border:1px solid #999;padding:4px;font-weight:bold">S/D</td></tr>';
+    for (var i = 0; i < sdl.length; i += 2) {
+      var a = sdl[i];
+      var b = sdl[i+1];
+      h += '<tr>';
+      h += '<td style="border:1px solid #999;padding:4px">' + a[0] + '</td>';
+      h += '<td style="border:1px solid #999;padding:4px;text-align:center">' + sdMark(a[1]) + '</td>';
+      if (b) {
+        h += '<td style="border:1px solid #999;padding:4px">' + b[0] + '</td>';
+        h += '<td style="border:1px solid #999;padding:4px;text-align:center">' + sdMark(b[1]) + '</td>';
+      } else {
+        h += '<td style="border:1px solid #999;padding:4px"></td><td style="border:1px solid #999;padding:4px"></td>';
+      }
+      h += '</tr>';
+    }
+    h += '<tr style="background:#e8eef5"><td colspan="4" style="padding:6px;font-weight:bold;color:#1a3a5c;text-transform:uppercase">EXAMINER DETAILS</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Scheduled</td><td style="border:1px solid #999;padding:4px">' + gv('f_exjournal') + '</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Conducted</td><td style="border:1px solid #999;padding:4px">' + gv('f_exconducted') + '</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Signature</td><td style="border:1px solid #999;padding:4px" colspan="3">' + gv('f_exsig') + '</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px;font-weight:bold">Re-key Date</td><td style="border:1px solid #999;padding:4px">' + gv('f_rekey') + '</td><td style="border:1px solid #999;padding:4px;font-weight:bold">Re-keyed By</td><td style="border:1px solid #999;padding:4px">' + gv('f_rekeyedby') + '</td></tr>';
+    h += '<tr style="background:#e8eef5"><td colspan="4" style="padding:6px;font-weight:bold;color:#1a3a5c;text-transform:uppercase">WEATHER</td></tr>';
+    var wx = [];
+    if (gc('f_w1')) wx.push('Bright/Dry'); if (gc('f_w2')) wx.push('Bright/Wet'); if (gc('f_w3')) wx.push('Raining');
+    if (gc('f_w4')) wx.push('Showers'); if (gc('f_w5')) wx.push('Foggy'); if (gc('f_w6')) wx.push('Dull/Wet');
+    if (gc('f_w7')) wx.push('Dull/Dry'); if (gc('f_w8')) wx.push('Snowing'); if (gc('f_w9')) wx.push('Icy');
+    if (gc('f_w10')) wx.push('Windy'); if (gc('f_w11')) wx.push('Other: ' + gv('f_w11t'));
+    h += '<tr><td style="border:1px solid #999;padding:4px" colspan="4">' + (wx.join(', ') || 'None') + '</td></tr>';
+    h += '<tr style="background:#e8eef5"><td colspan="4" style="padding:6px;font-weight:bold;color:#1a3a5c;text-transform:uppercase">FAULT DESCRIPTIONS</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px" colspan="4">' + gv('f_faultdesc') + '</td></tr>';
+    h += '<tr style="background:#e8eef5"><td colspan="4" style="padding:6px;font-weight:bold;color:#1a3a5c;text-transform:uppercase">TRAINER NOTES</td></tr>';
+    h += '<tr><td style="border:1px solid #999;padding:4px" colspan="4">' + gv('f_notes') + '</td></tr>';
+    h += '</table>';
+    h += '</div>'; // end page 2
+    return h;
+  }
+
+  /* Close PDF overlay */
+  window.closePDF = function() {
+    var ov = document.getElementById('pdfView');
+    if (ov) ov.remove();
+  };
+
+  /* Close PDF overlay on outside click */
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'pdfView' || e.target.closest('#pdfView span')) {
+      closePDF();
+    }
+  });
+
+  updateBadges();
+});
+
+})();
+</script>
+</body>
+</html>

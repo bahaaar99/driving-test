@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Generate DL25 PWA Icons</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;padding:20px;text-align:center}
+button{padding:12px 24px;font-size:16px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer}
+button:hover{background:#2e7d32}
+canvas{margin:10px;border:1px solid #ccc;max-width:100%}
+h2{color:#1a3a5c}
+</style>
+</head>
+<body>
+<h2>Generate PWA Icons for DL25</h2>
+<p>Click to generate <code>icon-192.png</code> and <code>icon-512.png</code>, then right-click each canvas → "Save image as..." to save in <code>dl25_deploy/</code></p>
+
+<button onclick="generate()">Generate Icons</button>
+
+<h3>512×512</h3>
+<canvas id="c512" width="512" height="512"></canvas>
+
+<h3>192×192</h3>
+<canvas id="c192" width="192" height="192"></canvas>
+
+<script>
+function draw(ctx, size) {
+  const r = size * 0.156; // 80px radius at 512
+  ctx.fillStyle = '#1a3a5c';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, size, size, r);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${size * 0.55}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('DL25', size/2, size/2 + size*0.02);
+}
+function generate() {
+  const c512 = document.getElementById('c512');
+  const c192 = document.getElementById('c192');
+  draw(c512.getContext('2d'), 512);
+  draw(c192.getContext('2d'), 192);
+}
+generate(); // auto-generate on load
+</script>
+</body>
+</html>
