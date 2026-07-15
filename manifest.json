@@ -1,6 +1,6 @@
 {
   "name": "DL25 Driving Test Report",
-  "short_name": "DL25",
+  "short_name": "DRIVING KIA",
   "description": "Offline DVSA DL25 driving test report form",
   "start_url": "index.html",
   "display": "standalone",
