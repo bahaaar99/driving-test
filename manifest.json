@@ -1,16 +1,24 @@
 {
-  "name": "DL25 Driving Test Report",
-  "short_name": "DRIVING KIA",
-  "description": "Offline DVSA DL25 driving test report form",
+  "name": "Driving-t",
+  "short_name": "Driving-t",
+  "description": "DL25 Driving Test Report",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#1a3a5c",
   "theme_color": "#1a3a5c",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ],
-  "categories": ["productivity", "utilities"],
-  "lang": "en-GB"
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
