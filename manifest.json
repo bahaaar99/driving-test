@@ -1,7 +1,7 @@
 {
   "name": "Driving-t",
   "short_name": "Driving-t",
-  "description": "DL25 Driving Test Report",
+  "description": "Driving Test",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#1a3a5c",
